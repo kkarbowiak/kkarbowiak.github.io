@@ -87,9 +87,9 @@ defaults:
 
 # Site Author
 author:
-  name:
-  picture:
-  email:
+  name: Krzysiek Karbowiak
+  picture: /images/kkarbowiak.jpg
+  email: krzysztof.karbowiak@interia.pl
   twitter:
   links:
     - title:
