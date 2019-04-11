@@ -88,3 +88,68 @@ if (!succeeded)
     throw BadFooCall(param1, param2, param3);
 }
 ```
+
+ 6. Remove no longer necessary logging
+
+Often, when a new feature is developed or a difficult debugging session is in progress, additional logs are added. Such logs are often meaningful only for their author, as they can be unstructured, placed randomly, and contain abbreviations. All other suffer from background noise when analysing logs looking for signs of defects.
+
+Once development or debugging is over, the logging statements should be combed through and the non-essential ones should be removed.
+
+ 7. Try to avoid ping-pong messages
+
+If you are logging a process that involves exchanging several messages (like some handshake) and perhaps is governed by a state machine, you might be tempted to log every step taken, like for example sending a request and getting a response. This is fine at the beginning, when the code is developed, but afterwards it adds verbosity without actual gains. Let's assume some code goes from state A to state D sending requests and getting responses:
+
+```
+A: sent request
+A: got response
+B: sent request
+B: got response
+C: sent request
+C: got response
+D: sequence complete
+```
+
+A much more concise and as informative way would be to produce the log that summarizes the whole operation:
+
+```
+Transition from A to D complete
+```
+
+or, in case of errors:
+
+```
+Error: could not send request from B
+```
+
+or:
+
+```
+Error: incorrect response in C
+```
+
+The above single lines are enough to inform that 1) sequence was completed successfully; 2) step A completed, but there was problem in B; 3) all was good up till response in C.
+
+Unless the timestamps of the log messages may help locate problems with slow communication in themselves, let's reduce their number.
+
+ 8. Use proper message level
+
+This one is tricky, as it is often difficult to determine at what level a particular entry should be logged. Many logging frameworks provide more or less the following message levels:
+
+ * FATAL<br/>Things have gone bad beyond recovery. Use this very sparingly, as this signifies program termination.
+ * ERROR<br/>The level at which all errors should be logged.
+ * WARNING<br/>The level at which potential problems or genuine warnings should be logged. Examples include informing a debug/beta build is running, experimental algorithm is used, an operation timed out, but was successfully retried.
+ * INFO<br/>The level at which normal operations should be logged, e.g. database connection, operation mode change, messages from OS.
+ * DEBUG<br/>The level at which function calls, parameter or return values, and algorithm steps should be logged. Mostly used during debugging, and should be trimmed down or removed completely before committing to main branch.
+ * VERBOSE<br/>Use sparingly, and mostly during development or debugging. Think twice whether you should really leave those messages afterwards.
+
+It should be noted here that an error on one (low) application layer may not be considered an error on other (higher) application layer. Examples include code that cannot read a value from registry, to which upper layer code is prepared by using a default value, or some connection being timed-out, which upper layer handles by retrying several times. In those cases it may be good to let upper layer code decide which condition should be considered error and which not (a warning perhaps) and whether the situation should be logged.
+
+There is also one more thing. I do not like the message severity and verbosity being conflated into a single hierarchy. **These are two separate concepts!** We can have a very verbose error message providing lots of details, as well as a very short debug message that just names current algorithm step. Unfortunately, this mixing is very common in logging frameworks. I have only once seen a framework (internal, unfortunately) which kept the concepts independent and had separate macros for logging short, normal, and verbose messages at each of the levels. It also allowed the same granularity when filtering the messages.
+
+ 9. Keep the logs machine-readable
+
+
+
+ 10. Review logging during code reviews
+
+I hope by now you understand that logging is far too important to be neglected. Therefore, when reviewing code, pay attention to logging statements. Are the logs informative, meaningful, relevant? Do they provide enough context and use proper level? In other words, do they conform to above guidelines? If not, do not hesitate to flag them. After all, some day you may need to read them.
