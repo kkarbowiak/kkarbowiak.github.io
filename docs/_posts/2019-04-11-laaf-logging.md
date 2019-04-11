@@ -65,3 +65,26 @@ Client2: disconnected
 ```
 
 Not it is clear that two client were involved.
+
+ 5. Take care when logging exceptions
+
+When a situation happens that requires throwing an exception, it is tempting to write code like this:
+
+```c++
+if (!succeeded)
+{
+    LOG(ERROR) << "Calling function Foo(param1, param2, param3) failed.";
+    throw BadFooCall();
+}
+```
+
+This is tempting, as it ensures that the information is logged. However, this will most likely result in the error printed twice, as at some point the exception is caught, and it's information logged.
+
+To avoid this, the exception object should store all the relevant information that describes the problem, to be acted upon and logged at the catch site, e.g.:
+
+```c++
+if (!succeeded)
+{
+    throw BadFooCall(param1, param2, param3);
+}
+```
