@@ -135,12 +135,12 @@ Unless the timestamps of the log messages may help locate problems with slow com
 
 This one is tricky, as it is often difficult to determine at what level a particular entry should be logged. Many logging frameworks provide more or less the following message levels:
 
- * FATAL<br/>Things have gone bad beyond recovery. Use this very sparingly, as this signifies program termination.
- * ERROR<br/>The level at which all errors should be logged.
- * WARNING<br/>The level at which potential problems or genuine warnings should be logged. Examples include informing a debug/beta build is running, experimental algorithm is used, an operation timed out, but was successfully retried.
- * INFO<br/>The level at which normal operations should be logged, e.g. database connection, operation mode change, messages from OS.
- * DEBUG<br/>The level at which function calls, parameter or return values, and algorithm steps should be logged. Mostly used during debugging, and should be trimmed down or removed completely before committing to main branch.
- * VERBOSE<br/>Use sparingly, and mostly during development or debugging. Think twice whether you should really leave those messages afterwards.
+ * **FATAL**<br/>Things have gone bad beyond recovery. Use this very sparingly, as this signifies program termination.
+ * **ERROR**<br/>The level at which all errors should be logged.
+ * **WARNING**<br/>The level at which potential problems or genuine warnings should be logged. Examples include informing a debug/beta build is running, experimental algorithm is used, an operation timed out, but was successfully retried.
+ * **INFO**<br/>The level at which normal operations should be logged, e.g. database connection, operation mode change, messages from OS.
+ * **DEBUG**<br/>The level at which function calls, parameter or return values, and algorithm steps should be logged. Mostly used during debugging, and should be trimmed down or removed completely before committing to main branch.
+ * **VERBOSE**<br/>Use sparingly, and mostly during development or debugging. Think twice whether you should really leave those messages afterwards.
 
 It should be noted here that an error on one (low) application layer may not be considered an error on other (higher) application layer. Examples include code that cannot read a value from registry, to which upper layer code is prepared by using a default value, or some connection being timed-out, which upper layer handles by retrying several times. In those cases it may be good to let upper layer code decide which condition should be considered error and which not (a warning perhaps) and whether the situation should be logged.
 
@@ -148,7 +148,7 @@ There is also one more thing. I do not like the message severity and verbosity b
 
  9. Keep the logs machine-readable
 
-
+This may seem irrelevant as long as the logs you read are short, but once you are confronted with a multi-megabyte (or even gigabyte) log file, looking for a problem may turn into looking for a needle in a haystack. In such cases having the logs in machine-friendly format is a game changer. You can write scripts to help analyse the logs and provide statistics on how often different problems occur, how regular they are, and what are the common issues.
 
  10. Review logging during code reviews
 
