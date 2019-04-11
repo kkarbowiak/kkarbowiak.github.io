@@ -42,4 +42,26 @@ And a good one:
 
 `Failed to open journal file for writing. Error code 0x00000005: Access is denied.`
 
+ 4. Always include object's name or identifier
 
+This is especially important if you are logging information on one of many instances of an object. And even if you think this is not necessary as there is only a single instance and you know which one the message relate to, believe me, sooner or later there will be more.
+
+Let's say you are coding a server and want to log clients activities. If you do it like this:
+
+```
+Client connected
+Client disconnected
+Client connected
+Client disconnected
+```
+
+There is no way to tell which client the messages regard to. Was it the same one and had some intermittent network problems? Consider an alternative:
+
+```
+Client1: connected
+Client1: disconnected
+Client2: connected
+Client2: disconnected
+```
+
+Not it is clear that two client were involved.
