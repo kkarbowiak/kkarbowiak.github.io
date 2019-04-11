@@ -4,7 +4,7 @@ excerpt: "On the importance of logging and some practices"
 last_modified_at: 2019-04-11
 ---
 
-Logging is very important. In fact it is so important that I would even paraphrase the famous quote and say it is _too important to be left to chance_.
+Logging is very important. In fact it is so important that I would even paraphrase the famous quote and say it is _too important to be left to chance_. I might even argue that logging is as important as the application's features. Perhaps not for the user, but definitely for you, the maintainer.
 
 Quite often logs, or perhaps also a memory dump, are all a developer has while investigating a problem reported by a customer. If the reproduction rate is low or there is no access to the machine on which the problem occurs, the importance of high quality logs becomes evident.
 
