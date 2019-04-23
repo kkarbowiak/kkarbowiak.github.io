@@ -159,3 +159,5 @@ Based on experience of mine and my colleagues, below are some guidelines that sh
  10. Review logging during code reviews
 
      I hope by now you understand that logging is far too important to be neglected. Therefore, when reviewing code, pay attention to logging statements. Are the logs informative, meaningful, relevant? Do they provide enough context and use proper level? In other words, do they conform to above guidelines? If not, do not hesitate to flag them. After all, some day you may need to read them.
+
+I hope you will find the above points useful. I know the list is not exhaustive, but at least it's a start.
