@@ -2,6 +2,8 @@
 title: "LaaF, or Logging as a Feature"
 excerpt: "On the importance of logging and some practices"
 last_modified_at: 2019-04-11
+categories:
+  - Programming
 tags:
   - logging
   - guidelines
