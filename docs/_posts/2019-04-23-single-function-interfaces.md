@@ -142,3 +142,39 @@ This form is more concise. It does not force client code to use inheritance. It 
 As you can see, the second customised function is supposed to write to a file, but due to its fixed signature, there is no way to provide the file name. It either has to be hardcoded (bad!), or accessible through a global variable (bad!).
 
 The file to write to is some state that is not encompassed by the function. But we can fix this.
+
+## A better alternative solution ##
+
+Keeping some state is what objects are good at. But are we forced to go back to the original solution? No. We can use something called partial function application in Functional Programming parlance, which in C++ is realised by `std::bind` or a capturing lambda (continuation) in conjunction with `std::function`:
+
+```c++
+using write_func = std::function<void (std::string const &)>;
+
+class Logger
+{
+    public:
+        explicit Logger(write_func write)
+            : m_write(write)
+        {
+        }
+
+        void log(std::string const & msg)
+        {
+            m_write(msg);
+        }
+
+    private:
+        write_func m_write;
+};
+
+void write_to_stdout(std::string const & msg);
+void write_to_file(std::filesystem::path const & file, std::string const & msg);
+
+int main()
+{
+    Logger(&write_to_stdout).log("this goes to stdout");
+    std::filesystem::path const file = "log.txt";
+    Logger(std::bind(write_to_file, file, _1)).log("this goes to a file"); // using std::bind to fix the first parameter
+    Logger([file](std::string const & msg){ write_to_file(file, msg); }).log("this goes to a file") // using a capturing lambda to fix the first parameter
+}
+```
