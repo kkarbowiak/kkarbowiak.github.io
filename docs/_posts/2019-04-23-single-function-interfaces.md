@@ -55,4 +55,90 @@ Imagine you are designing a class hierarchy and want to customise a single behav
 
 But is it the best one? The safest? The simplest? And lastly, the most efficient?
 
-## 
+## An alternative solution ##
+
+An alternative to using inheritance is something much simpler and available already in C. If you want to customise a function's behaviour you ...write another one!
+
+Going back to the Logger example, instead of doing this:
+
+```c++
+class IWriter
+{
+    public:
+        virtual void writeMessage(std::string const & msg) = 0;
+        virtual ~IWriter() = default;
+};
+
+class Logger
+{
+    public:
+        explicit Logger(std::unique_ptr<IWriter> writer)
+            : m_writer(std::move(writer))
+        {
+        }
+
+        void log(std::string const & msg)
+        {
+            m_writer->writeMessage(msg);
+        }
+
+    private:
+        std::unique_ptr<IWriter> m_writer;
+};
+
+class StdOutWriter : public IWriter
+{
+    // ...
+};
+
+class FileWriter : public IWriter
+{
+    public:
+        explicit FileWriter(std::filesystem::path const & file);
+    // ...
+};
+
+int main()
+{
+    Logger(std::make_unique(StdOutWriter)).log("this goes to stdout");
+    Logger(std::make_unique(FileWriter("log.txt"))).log("this goes to a file");
+}
+```
+
+you do this:
+
+```c++
+using write_func = void (*)(std::string const &);
+
+class Logger
+{
+    public:
+        explicit Logger(write_func write)
+            : m_write(write)
+        {
+        }
+
+        void log(std::string const & msg)
+        {
+            m_write(msg);
+        }
+
+    private:
+        write_func m_write;
+};
+
+void write_to_stdout(std::string const & msg);
+void write_to_file(std::string const & msg);
+
+int main()
+{
+    Logger(&write_to_stdout).log("this goes to stdout");
+    Logger(&write_to_file).log("this goes to a file");
+}
+```
+
+This form is more concise. It does not force client code to use inheritance. It does not introduce potential memory leaks and does not force using dynamic allocation nor smart pointers. However, it is not perfect.
+
+As you can see, the second customised function is supposed to write to a file, but due to its fixed signature, there is no way to provide the file name. It either has to be hardcoded (bad!), or accessible through a global variable (bad!).
+
+The file to write to is some state that is not encompassed by the function. But we can fix this.
