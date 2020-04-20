@@ -10,7 +10,8 @@ tags:
   - C++
 ---
 
-Have you ever seen an interface class with just a single function meant to be overridden in a derived class? Something like this:
+Have you ever seen an interface class with just a single function meant to be
+overridden in a derived class? Something like this:
 
 ```c++
 class IInterface
@@ -32,7 +33,8 @@ class IInterface
 };
 ```
 
-which includes the virtual destructor, which ensures polymorphic deletion and prevents from potential memory leaks, or (far less common) like this:
+which includes the virtual destructor, which ensures polymorphic deletion and
+prevents from potential memory leaks, or (far less common) like this:
 
 ```c++
 class IInterface
@@ -45,19 +47,30 @@ class IInterface
 };
 ```
 
-which includes a protected non-virtual destructor, which prevents from polymorphic deletion and saves one entry in the v-table.
+which includes a protected non-virtual destructor, which prevents from
+polymorphic deletion and saves one entry in the v-table.
 
-The above three definitions already foreshadow the upcoming problems. You just wanted to customise a single function, but already had to avoid a pitfall (memory leak) and make a decision on the form of the destructor. Of course, this pitfall is not common to all programming languages, but it is not the only one.
+The above three definitions already foreshadow the upcoming problems. You just
+wanted to customise a single function, but already had to avoid a pitfall
+(memory leak) and make a decision on the form of the destructor. Of course, this
+pitfall is not common to all programming languages, but it is not the only one.
 
 ## Single-function interfaces ##
 
-Imagine you are designing a class hierarchy and want to customise a single behaviour. The natural and common in Object Oriented Design approach is to expose this behaviour via an interface like in the C++ examples above. In Java this is probably the way to go. In Python, this may be the way to go (although there are other quite elegant options). In C++, this is a well-trodden path.
+Imagine you are designing a class hierarchy and want to customise a single
+behaviour. The natural and common in Object Oriented Design approach is to
+expose this behaviour via an interface like in the C++ examples above. In Java
+this is probably the way to go. In Python, this may be the way to go (although
+there are other quite elegant options). In C++, this is a well-trodden path.
 
-But is it the best one? The safest? The simplest? And lastly, the most efficient?
+But is it the best one? The safest? The simplest? And lastly, the most
+efficient?
 
 ## An alternative solution ##
 
-An alternative to using inheritance is something much simpler and available already in C. If you want to customise a function's behaviour you ...write another one!
+An alternative to using inheritance is something much simpler and available
+already in C. If you want to customise a function's behaviour you ...write
+another one!
 
 Going back to the Logger example, instead of doing this:
 
@@ -137,15 +150,25 @@ int main()
 }
 ```
 
-This form is more concise. It does not force client code to use inheritance. It does not introduce potential memory leaks and does not force using dynamic allocation nor smart pointers. However, it is not perfect.
+This form is more concise. It does not force client code to use inheritance. It
+does not introduce potential memory leaks and does not force using dynamic
+allocation nor smart pointers. However, it is not perfect.
 
-As you can see, the second customised function is supposed to write to a file, but due to its fixed signature, there is no way to provide the file name. It either has to be hardcoded (bad!), or accessible through a global variable (bad!).
+As you can see, the second customised function is supposed to write to a file,
+but due to its fixed signature, there is no way to provide the file name. It
+either has to be hardcoded (bad!), or accessible through a global variable
+(bad!).
 
-The file to write to is some state that is not encompassed by the function. But we can fix this.
+The file to write to is some state that is not encompassed by the function. But
+we can fix this.
 
 ## A better alternative solution ##
 
-Keeping some state is what objects are good at. But are we forced to go back to the original solution? No. We can use something called partial function application in Functional Programming parlance, which in C++ is realised by `std::bind` or a capturing lambda (continuation) in conjunction with `std::function`:
+Keeping some state is what objects are good at. But are we forced to go back to
+the original solution? No. We can use something called partial function
+application in Functional Programming parlance, which in C++ is realised by
+`std::bind` or a capturing lambda (continuation) in conjunction with
+`std::function`:
 
 ```c++
 using write_func = std::function<void (std::string const &)>;
